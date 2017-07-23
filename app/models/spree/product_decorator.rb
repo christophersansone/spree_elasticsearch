@@ -110,7 +110,7 @@ module Spree
         when 'score'
           [ '_score', { 'name.untouched' => { order: 'asc' } }, { price: { order: 'asc' } } ]
         else
-          [ { 'name.untouched' => { order: 'asc' } }, { price: { order: 'asc' } }, '_score' ]
+          [ '_score', { 'name.untouched' => { order: 'asc' } }, { price: { order: 'asc' } } ]
         end
 
         # aggregations
