@@ -133,7 +133,7 @@ module Spree
         and_filter << { terms: { taxon_ids: taxons } } unless taxons.empty?
         # only return products that are available
         and_filter << { range: { available_on: { lte: 'now' } } }
-        result[:query][:bool][:filter] = { and: and_filter } unless and_filter.empty?
+        result[:query][:bool][:filter] = { bool: { must: and_filter } } unless and_filter.empty?
 
         # add price filter outside the query because it should have no effect on facets
         if price_min && price_max && (price_min < price_max)
