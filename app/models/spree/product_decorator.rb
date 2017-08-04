@@ -22,10 +22,8 @@ module Spree
       }
     ) do
       mapping _all: { analyzer: 'ngram_analyzer', search_analyzer: 'whitespace' } do
-        indexes :name, type: 'text' do
-          indexes :name, type: 'text', analyzer: 'ngram_analyzer', boost: 100
-          indexes :untouched, type: 'text', include_in_all: false, index: 'not_analyzed'
-        end
+        indexes :name, type: 'text', analyzer: 'ngram_analyzer', boost: 100
+        indexes :untouched_name, type: 'text', include_in_all: false, index: 'not_analyzed'
 
         indexes :description, analyzer: 'snowball'
         indexes :available_on, type: 'date', format: 'dateOptionalTime', include_in_all: false
@@ -38,7 +36,7 @@ module Spree
 
     def as_indexed_json(options={})
       result = as_json({
-        methods: [:price, :sku],
+        methods: [:price, :sku, :untouched_name],
         only: [:available_on, :description, :name],
         include: {
           variants: {
@@ -54,6 +52,10 @@ module Spree
       result[:properties] = property_list unless property_list.empty?
       result[:taxon_ids] = taxons.map(&:self_and_ancestors).flatten.uniq.map(&:id) unless taxons.empty?
       result
+    end
+    
+    def untouched_name
+      name
     end
 
     def self.get(product_id)
@@ -117,17 +119,17 @@ module Spree
 
         sorting = case @sorting
         when 'name_asc'
-          [ { 'name.untouched' => { order: 'asc' } }, { price: { order: 'asc' } }, '_score' ]
+          [ { 'untouched_name' => { order: 'asc' } }, { price: { order: 'asc' } }, '_score' ]
         when 'name_desc'
-          [ { 'name.untouched' => { order: 'desc' } }, { price: { order: 'asc' } }, '_score' ]
+          [ { 'untouched_name' => { order: 'desc' } }, { price: { order: 'asc' } }, '_score' ]
         when 'price_asc'
-          [ { 'price' => { order: 'asc' } }, { 'name.untouched' => { order: 'asc' } }, '_score' ]
+          [ { 'price' => { order: 'asc' } }, { 'untouched_name' => { order: 'asc' } }, '_score' ]
         when 'price_desc'
-          [ { 'price' => { order: 'desc' } }, { 'name.untouched' => { order: 'asc' } }, '_score' ]
+          [ { 'price' => { order: 'desc' } }, { 'untouched_name' => { order: 'asc' } }, '_score' ]
         when 'score'
-          [ '_score', { 'name.untouched' => { order: 'asc' } }, { price: { order: 'asc' } } ]
+          [ '_score', { 'untouched_name' => { order: 'asc' } }, { price: { order: 'asc' } } ]
         else
-          [ '_score', { 'name.untouched' => { order: 'asc' } }, { price: { order: 'asc' } } ]
+          [ '_score', { 'untouched_name' => { order: 'asc' } }, { price: { order: 'asc' } } ]
         end
 
         # aggregations
