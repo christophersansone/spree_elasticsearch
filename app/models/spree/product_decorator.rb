@@ -23,7 +23,7 @@ module Spree
     ) do
       mapping _all: { analyzer: 'ngram_analyzer', search_analyzer: 'whitespace' } do
         indexes :name, type: 'text', analyzer: 'ngram_analyzer', boost: 100
-        indexes :untouched_name, type: 'text', include_in_all: false, index: 'not_analyzed'
+        indexes :untouched_name, type: 'keyword', include_in_all: false, index: 'not_analyzed'
 
         indexes :description, analyzer: 'snowball'
         indexes :available_on, type: 'date', format: 'dateOptionalTime', include_in_all: false
