@@ -30,7 +30,7 @@ module Spree
         indexes :price, type: 'double'
         indexes :sku, type: 'text', index: 'not_analyzed'
         indexes :taxon_ids, type: 'text', index: 'not_analyzed'
-        indexes :properties, type: 'text', index: 'not_analyzed'
+        indexes :properties, type: 'keyword', index: 'not_analyzed'
       end
     end
 
