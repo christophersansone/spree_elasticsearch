@@ -21,9 +21,9 @@ module Spree
         }
       }
     ) do
-      mapping _all: { analyzer: 'nGram_analyzer', search_analyzer: 'whitespace_analyzer' } do
+      mapping _all: { analyzer: 'ngram_analyzer', search_analyzer: 'whitespace_analyzer' } do
         indexes :name, type: 'text' do
-          indexes :name, type: 'text', analyzer: 'nGram_analyzer', boost: 100
+          indexes :name, type: 'text', analyzer: 'ngram_analyzer', boost: 100
           indexes :untouched, type: 'text', include_in_all: false, index: 'not_analyzed'
         end
 
