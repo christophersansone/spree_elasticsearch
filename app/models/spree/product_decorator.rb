@@ -6,15 +6,15 @@ module Spree
     document_type 'spree_product'
 
     mapping _all: { analyzer: 'nGram_analyzer', search_analyzer: 'whitespace_analyzer' } do
-      indexes :name, type: 'string', analyzer: 'nGram_analyzer', boost: 100
-      indexes :untouched, type: 'string', include_in_all: false, index: 'not_analyzed'
+      indexes :name, type: 'text', analyzer: 'nGram_analyzer', boost: 100
+      indexes :untouched, type: 'text', include_in_all: false, index: 'not_analyzed'
 
       indexes :description, analyzer: 'snowball'
       indexes :available_on, type: 'date', format: 'dateOptionalTime', include_in_all: false
       indexes :price, type: 'double'
-      indexes :sku, type: 'string', index: 'not_analyzed'
-      indexes :taxon_ids, type: 'string', index: 'not_analyzed'
-      indexes :properties, type: 'string', index: 'not_analyzed'
+      indexes :sku, type: 'text', index: 'not_analyzed'
+      indexes :taxon_ids, type: 'text', index: 'not_analyzed'
+      indexes :properties, type: 'text', index: 'not_analyzed'
     end
 
     def as_indexed_json(options={})
