@@ -6,8 +6,10 @@ module Spree
     document_type 'spree_product'
 
     mapping _all: { analyzer: 'nGram_analyzer', search_analyzer: 'whitespace_analyzer' } do
-      indexes :name, type: 'text', analyzer: 'nGram_analyzer', boost: 100
-      indexes :untouched, type: 'text', include_in_all: false, index: 'not_analyzed'
+      indexes :name, type: 'text' do
+        indexes :name, type: 'text', analyzer: 'nGram_analyzer', boost: 100
+        indexes :untouched, type: 'text', include_in_all: false, index: 'not_analyzed'
+      end
 
       indexes :description, analyzer: 'snowball'
       indexes :available_on, type: 'date', format: 'dateOptionalTime', include_in_all: false
