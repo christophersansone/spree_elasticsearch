@@ -15,8 +15,10 @@ module Spree
         },
         tokenizer: {
           ngram_tokenizer: {
-            type: 'edgeNGram',
-            min_gram: 3
+            type: 'ngram',
+            min_gram: 3,
+            max_gram: 3,
+            token_chars: [ 'letter', 'digit' ]
           }
         }
       }
@@ -29,7 +31,7 @@ module Spree
         indexes :available_on, type: 'date', format: 'dateOptionalTime', include_in_all: false
         indexes :price, type: 'double'
         indexes :sku, type: 'text', index: 'not_analyzed'
-        indexes :taxon_ids, type: 'text', index: 'not_analyzed'
+        indexes :taxon_ids, type: 'keyword', index: 'not_analyzed'
         indexes :properties, type: 'keyword', index: 'not_analyzed'
       end
     end
