@@ -5,18 +5,35 @@ module Spree
     index_name Spree::ElasticsearchSettings.index
     document_type 'spree_product'
 
-    mapping _all: { analyzer: 'nGram_analyzer', search_analyzer: 'whitespace_analyzer' } do
-      indexes :name, type: 'text' do
-        indexes :name, type: 'text', analyzer: 'nGram_analyzer', boost: 100
-        indexes :untouched, type: 'text', include_in_all: false, index: 'not_analyzed'
-      end
+    settings(
+      analysis: {
+        analyzer: {
+          ngram_analyzer: {
+            filter: ['lowercase', 'word_delimiter'],
+            tokenizer: :ngram_tokenizer
+          }
+        },
+        tokenizer: {
+          ngram_tokenizer: {
+            type: 'edgeNGram',
+            min_gram: 3
+          }
+        }
+      }
+    ) do
+      mapping _all: { analyzer: 'nGram_analyzer', search_analyzer: 'whitespace_analyzer' } do
+        indexes :name, type: 'text' do
+          indexes :name, type: 'text', analyzer: 'nGram_analyzer', boost: 100
+          indexes :untouched, type: 'text', include_in_all: false, index: 'not_analyzed'
+        end
 
-      indexes :description, analyzer: 'snowball'
-      indexes :available_on, type: 'date', format: 'dateOptionalTime', include_in_all: false
-      indexes :price, type: 'double'
-      indexes :sku, type: 'text', index: 'not_analyzed'
-      indexes :taxon_ids, type: 'text', index: 'not_analyzed'
-      indexes :properties, type: 'text', index: 'not_analyzed'
+        indexes :description, analyzer: 'snowball'
+        indexes :available_on, type: 'date', format: 'dateOptionalTime', include_in_all: false
+        indexes :price, type: 'double'
+        indexes :sku, type: 'text', index: 'not_analyzed'
+        indexes :taxon_ids, type: 'text', index: 'not_analyzed'
+        indexes :properties, type: 'text', index: 'not_analyzed'
+      end
     end
 
     def as_indexed_json(options={})
