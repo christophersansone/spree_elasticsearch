@@ -104,7 +104,10 @@ module Spree
       def to_hash
         q = { match_all: {} }
         unless query.blank? # nil or empty
-          q = { query_string: { query: query, fields: ['name^5','description','sku'], default_operator: 'AND', use_dis_max: true } }
+          # for some reason, double quotes in the "query_string" filter need to be double escaped --
+          # one will happen automatically, but the other does not, so it needs to be done manually
+          escaped_query = query.gsub('"', '\"')
+          q = { query_string: { query: escaped_query, fields: ['name^5','description','sku'], default_operator: 'AND', use_dis_max: true } }
         end
         query = q
 
@@ -168,7 +171,7 @@ module Spree
     end
 
     private
-
+    
     def property_list
       product_properties.map{|pp| "#{pp.property.name}||#{pp.value}"}
     end
