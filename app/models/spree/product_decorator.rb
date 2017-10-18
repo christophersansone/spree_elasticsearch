@@ -29,6 +29,7 @@ module Spree
 
         indexes :description, analyzer: 'snowball'
         indexes :available_on, type: 'date', format: 'dateOptionalTime', include_in_all: false
+        indexes :discontinue_on, type: 'date', format: 'dateOptionalTime', include_in_all: false
         indexes :price, type: 'double'
         indexes :sku, type: 'text', index: 'not_analyzed'
         indexes :taxon_ids, type: 'keyword', index: 'not_analyzed'
@@ -39,7 +40,7 @@ module Spree
     def as_indexed_json(options={})
       result = as_json({
         methods: [:price, :sku, :untouched_name],
-        only: [:available_on, :description, :name],
+        only: [:available_on, :discontinue_on, :description, :name],
         include: {
           variants: {
             only: [:sku],
@@ -158,7 +159,9 @@ module Spree
         # taxon and property filters have an effect on the facets
         and_filter << { terms: { taxon_ids: taxons } } unless taxons.empty?
         # only return products that are available
-        and_filter << { range: { available_on: { lte: 'now' } } }
+        and_filter << { range: { available_on: { lte: 'now/1h' } } }
+        # only return products that have not been discontinued
+        and_filter << { bool: { should: [ { missing: { field: 'discontinue_on' } }, { range: { discontinue_on: { gte: 'now/1h' } } } ] } }
         result[:query][:bool][:filter] = { bool: { must: and_filter } } unless and_filter.empty?
 
         # add price filter outside the query because it should have no effect on facets
