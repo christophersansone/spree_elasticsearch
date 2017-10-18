@@ -56,7 +56,7 @@ module Spree
       result[:taxon_ids] = taxons.map(&:self_and_ancestors).flatten.uniq.map(&:id) unless taxons.empty?
       result
     end
-    
+
     def untouched_name
       name
     end
@@ -161,7 +161,7 @@ module Spree
         # only return products that are available
         and_filter << { range: { available_on: { lte: 'now/1h' } } }
         # only return products that have not been discontinued
-        and_filter << { bool: { should: [ { missing: { field: 'discontinue_on' } }, { range: { discontinue_on: { gte: 'now/1h' } } } ] } }
+        and_filter << { bool: { should: [ { bool: { must_not: { exists: { field: 'discontinue_on' } } } }, { range: { discontinue_on: { gte: 'now/1h' } } } ] } }
         result[:query][:bool][:filter] = { bool: { must: and_filter } } unless and_filter.empty?
 
         # add price filter outside the query because it should have no effect on facets
@@ -174,7 +174,7 @@ module Spree
     end
 
     private
-    
+
     def property_list
       product_properties.map{|pp| "#{pp.property.name}||#{pp.value}"}
     end
